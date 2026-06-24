@@ -259,6 +259,14 @@ def detect_board():
         from machine import Pin
 
         if is_esp32s3:
+            if __debug__: logger.debug("waveshare_rlcd_42 ?")
+            try:
+                pin18 = Pin(18, Pin.IN, Pin.PULL_UP)
+                if pin18.value() == 1:
+                    return "waveshare_rlcd_42"
+            except Exception as e:
+                if __debug__: logger.debug("waveshare_rlcd_42 detection got exception: %s", e)
+
             if __debug__: logger.debug("(emulated) lilygo_t_display_s3 ?")
             try:
                 # 2 buttons have PCB pull-ups so they'll be high unless pressed

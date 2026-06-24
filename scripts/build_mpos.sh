@@ -23,6 +23,7 @@ if [ -z "$target" ]; then
     echo "Example: $0 esp32s3"
     echo "Example: $0 unphone"
     echo "Example: $0 lilygo_t4"
+    echo "Example: $0 rlcd_42"
     echo "Example: $0 clean"
 	exit 1
 fi
@@ -151,7 +152,7 @@ popd
 echo "Refreshing freezefs..."
 "$codebasedir"/scripts/freezefs_mount_builtin.sh
 
-if [ "$target" == "esp32" -o "$target" == "esp32s3" -o "$target" == "unphone" -o "$target" == "esp32-small" -o "$target" == "lilygo_t4" ]; then
+if [ "$target" == "esp32" -o "$target" == "esp32s3" -o "$target" == "unphone" -o "$target" == "esp32-small" -o "$target" == "lilygo_t4" -o "$target" == "rlcd_42" ]; then
 	# Cleanup compiled .py files, otherwise if one from lib/ gets delected, the old .mpy might be used
 	rm -r lvgl_micropython/lib/micropython/ports/esp32/build-ESP32_GENERIC-SPIRAM/frozen_mpy 2>/dev/null
 	rm -r lvgl_micropython/lib/micropython/ports/esp32/build-ESP32_GENERIC_S3-SPIRAM_OCT/frozen_mpy 2>/dev/null
@@ -183,6 +184,13 @@ if [ "$target" == "esp32" -o "$target" == "esp32s3" -o "$target" == "unphone" -o
 		partition_size="3700000"
 		flash_size="4"
 		otasupport="" # too small for 2 OTA partitions + internal storage
+	elif [ "$target" == "rlcd_42" ]; then
+		BOARD=ESP32_GENERIC_S3
+		BOARD_VARIANT=SPIRAM_OCT
+		flash_size="16"
+		otasupport="--ota"
+		extra_configs="CONFIG_MBEDTLS_HARDWARE_AES=n CONFIG_MBEDTLS_HARDWARE_SHA=n CONFIG_MBEDTLS_HARDWARE_MPI=n"
+		extra_configs="$extra_configs --enable-uart-repl=y"
 	else # esp32s3 or unphone
         if [ "$target" == "unphone" ]; then
             flash_size="8"
@@ -201,7 +209,9 @@ if [ "$target" == "esp32" -o "$target" == "esp32s3" -o "$target" == "unphone" -o
 
 	if [ "$BOARD_VARIANT" == "SPIRAM" -o "$BOARD_VARIANT" == "SPIRAM_OCT" ]; then
 		# Camera only works on boards configured with spiram, otherwise the build breaks
-		extra_configs="$extra_configs USER_C_MODULE=$codebasedir/micropython-camera-API/src/micropython.cmake"
+		if [ "$target" != "rlcd_42" ]; then
+			extra_configs="$extra_configs USER_C_MODULE=$codebasedir/micropython-camera-API/src/micropython.cmake"
+		fi
 	fi
 
 	manifest=$(readlink -f "$codebasedir"/manifests/manifest.py)
