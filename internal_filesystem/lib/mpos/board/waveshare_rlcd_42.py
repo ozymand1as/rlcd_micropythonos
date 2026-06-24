@@ -86,6 +86,39 @@ try:
 except Exception as e:
     logger.error("Button init failed: %s" % (e,))
 
+I2C_SDA = 13
+I2C_SCL = 14
+
+try:
+    i2c_bus = machine.I2C(0, sda=machine.Pin(I2C_SDA), scl=machine.Pin(I2C_SCL), freq=100000)
+
+    from mpos.hardware.cardkb import CardKB
+
+    cardkb = CardKB(i2c_bus)
+
+    def cardkb_read(indev_drv, data):
+        key = cardkb.get_key()
+        if key != 0:
+            lv_key, valid = cardkb.to_lvgl_key(key)
+            if valid:
+                data.key = lv_key
+                data.state = lv.INDEV_STATE.PRESSED
+                return False
+        data.state = lv.INDEV_STATE.RELEASED
+        return False
+
+    cardkb_indev = lv.indev_create()
+    lv.indev_set_type(cardkb_indev, lv.INDEV_TYPE.KEYPAD)
+    lv.indev_set_read_cb(cardkb_indev, cardkb_read)
+    if mpos.ui.main_group:
+        lv.indev_set_group(cardkb_indev, mpos.ui.main_group)
+
+    if __debug__:
+        logger.debug("CardKB initialized on I2C SDA=%s SCL=%s" % (I2C_SDA, I2C_SCL))
+
+except Exception as e:
+    logger.warning("CardKB init failed (non-critical): %s" % (e,))
+
 from mpos import BatteryManager
 
 
