@@ -135,10 +135,12 @@ class InputActivity(Activity):
             placeholder = self.setting.get("placeholder")
             if placeholder:
                 self.textarea.set_placeholder_text(placeholder)
-            from mpos import MposKeyboard
-            self.keyboard = MposKeyboard(input_screen)
-            self.keyboard.add_flag(lv.obj.FLAG.HIDDEN)
-            self.keyboard.set_textarea(self.textarea)
+            from mpos import InputManager
+            if not InputManager.has_indev_type(lv.INDEV_TYPE.KEYPAD):
+                from mpos import MposKeyboard
+                self.keyboard = MposKeyboard(input_screen)
+                self.keyboard.add_flag(lv.obj.FLAG.HIDDEN)
+                self.keyboard.set_textarea(self.textarea)
 
         # Optional informational note below the input widget.
         note_text = self.setting.get("note")

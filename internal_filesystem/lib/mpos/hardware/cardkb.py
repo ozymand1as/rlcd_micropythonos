@@ -6,18 +6,18 @@ logger = logging.getLogger(__name__)
 
 CARDKB_ADDR = 0x5F
 
-# ASCII to LVGL key mapping for special keys
 _SPECIAL_KEYS = {
-    10: lv.KEY.ENTER,      # newline / enter
-    8: lv.KEY.BACKSPACE,   # backspace
-    9: lv.KEY.TAB,         # tab
-    27: lv.KEY.ESC,        # escape
-    127: lv.KEY.DEL,       # delete
-    32: lv.KEY.SPACE,      # space
+    13: lv.KEY.ENTER,
+    8: lv.KEY.BACKSPACE,
+    9: lv.KEY.TAB,
+    27: lv.KEY.ESC,
+    127: lv.KEY.DEL,
+    32: lv.KEY.SPACE,
+    180: lv.KEY.LEFT,
+    181: lv.KEY.UP,
+    182: lv.KEY.DOWN,
+    183: lv.KEY.RIGHT,
 }
-
-# Arrow key escape sequences sent by some keyboards
-# CardKB doesn't send escape sequences, but we map if needed
 
 
 class CardKB:

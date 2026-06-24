@@ -4,6 +4,7 @@ import time
 import lvgl as lv
 import machine
 import mpos.ui
+from mpos import InputManager
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +113,7 @@ try:
     lv.indev_set_read_cb(cardkb_indev, cardkb_read)
     if mpos.ui.main_group:
         lv.indev_set_group(cardkb_indev, mpos.ui.main_group)
+    InputManager.register_indev(cardkb_indev)
 
     if __debug__:
         logger.debug("CardKB initialized on I2C SDA=%s SCL=%s" % (I2C_SDA, I2C_SCL))
